@@ -42,7 +42,7 @@
   <parent>
     <artifactId>dcm4che-parent</artifactId>
     <groupId>org.dcm4che</groupId>
-    <version>5.32.0</version>
+    <version>5.32.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>dcm4che-assembly</artifactId>
@@ -291,27 +291,12 @@
     </dependency>
     <dependency>
       <groupId>org.dcm4che</groupId>
-      <artifactId>dcm4che-qstar</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che</groupId>
       <artifactId>dcm4che-soundex</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.dcm4che</groupId>
       <artifactId>dcm4che-ws-rs</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che</groupId>
-      <artifactId>dcm4che-xdsi</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che</groupId>
-      <artifactId>dcm4che-xroad</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -516,11 +501,6 @@
     </dependency>
     <dependency>
       <groupId>org.dcm4che.tool</groupId>
-      <artifactId>dcm4che-tool-qstar</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che.tool</groupId>
       <artifactId>dcm4che-tool-stgcmtscu</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -576,22 +556,12 @@
     </dependency>
     <dependency>
       <groupId>org.dcm4che.tool</groupId>
-      <artifactId>dcm4che-tool-wadows</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che.tool</groupId>
       <artifactId>dcm4che-tool-xml2dcm</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.dcm4che.tool</groupId>
       <artifactId>dcm4che-tool-xml2hl7</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che.tool</groupId>
-      <artifactId>dcm4che-tool-xroad</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

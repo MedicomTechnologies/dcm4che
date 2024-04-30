@@ -43,7 +43,7 @@
   <artifactId>dcm4che-parent</artifactId>
   <packaging>pom</packaging>
   <name>dcm4che DICOM toolkit and utilities</name>
-  <version>5.32.0</version>
+  <version>5.32.1</version>
   <description>dcm4che DICOM toolkit and utilities</description>
   <licenses>
     <license>
@@ -227,14 +227,10 @@
     <module>dcm4che-net-audit</module>
     <module>dcm4che-net-hl7</module>
     <module>dcm4che-net-imageio</module>
-    <module>dcm4che-qstar</module>
     <module>dcm4che-soundex</module>
     <module>dcm4che-ws-rs</module>
-    <module>dcm4che-xdsi</module>
-    <module>dcm4che-xroad</module>
     <module>dcm4che-tool</module>
     <module>dcm4che-assembly</module>
-    <module>dcm4che-jboss-modules</module>
     <module>dcm4che-camel</module>
     <module>dcm4che-test-data</module>
   </modules>
