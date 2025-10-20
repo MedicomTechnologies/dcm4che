@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  EOS imaging Private Elements Dictionary
+  Additions for correct VR handling in dcm2dcm transcoding
+-->
+<elements>
+  <el tag="0873xx00" keyword="InternalData1000" vr="US" vm="1">Internal data (0873,1000)</el>
+  <el tag="0873xx32" keyword="InternalData1032" vr="SL" vm="1">Internal data (0873,1032)</el>
+  <el tag="0873xx33" keyword="InternalData1033" vr="SL" vm="1">Internal data (0873,1033)</el>
+  <el tag="0873xx34" keyword="InternalData1034" vr="FL" vm="1">Internal data (0873,1034)</el>
+  <el tag="0873xx36" keyword="InternalData1036" vr="SL" vm="1">Internal data (0873,1036)</el>
+  <el tag="0873xx40" keyword="InternalData1040" vr="FL" vm="1">Internal data (0873,1040)</el>
+  <el tag="0873xx41" keyword="InternalData1041" vr="FL" vm="1">Internal data (0873,1041)</el>
+  <el tag="0873xx43" keyword="InternalData1043" vr="FL" vm="1">Internal data (0873,1043)</el>
+  <el tag="0873xx45" keyword="InternalData1045" vr="FL" vm="1">Internal data (0873,1045)</el>
+  <el tag="0873xx47" keyword="InternalData1047" vr="SL" vm="1">Internal data (0873,1047)</el>
+  <el tag="0873xx57" keyword="InternalData1057" vr="CS" vm="1">Internal data (0873,1057)</el>
+  <el tag="0873xx59" keyword="InternalData1059" vr="CS" vm="1">Internal data (0873,1059)</el>
+  <el tag="0873xx60" keyword="InternalData1060" vr="CS" vm="1">Internal data (0873,1060)</el>
+  <el tag="0873xx61" keyword="InternalData1061" vr="US" vm="1">Internal data (0873,1061)</el>
+  <el tag="0873xx63" keyword="InternalData1063" vr="FL" vm="1">Internal data (0873,1063)</el>
+  <el tag="0873xx65" keyword="InternalData1065" vr="DS" vm="1">Internal data (0873,1065)</el>
+  <el tag="0873xx66" keyword="InternalData1066" vr="US" vm="1">Internal data (0873,1066)</el>
+  <el tag="0873xx70" keyword="InternalData1070" vr="DS" vm="1">Internal data (0873,1070)</el>
+  <el tag="0873xx71" keyword="InternalData1071" vr="CS" vm="1">Internal data (0873,1071)</el>
+  <el tag="0873xx72" keyword="InternalData1072" vr="OB" vm="1">Internal data (0873,1072)</el>
+  <el tag="0873xx73" keyword="InternalData1073" vr="DS" vm="1">Internal data (0873,1073)</el>
+  <el tag="0873xx74" keyword="InternalData1074" vr="US" vm="1">Internal data (0873,1074)</el>
+  <el tag="0873xx79" keyword="InternalData1079" vr="FL" vm="1">Internal data (0873,1079)</el>
+  <el tag="0873xx80" keyword="InternalData1080" vr="UN" vm="1">Internal data (0873,1080)</el>
+  <el tag="0873xx81" keyword="InternalData1081" vr="UT" vm="1">Internal data (0873,1081)</el>
+  <el tag="0873xx82" keyword="InternalData1082" vr="CS" vm="1">Internal data (0873,1082)</el>
+  <el tag="0873xx83" keyword="InternalData1083" vr="FL" vm="1">Internal data (0873,1083)</el>
+  <el tag="0873xx84" keyword="InternalData1084" vr="FL" vm="1">Internal data (0873,1084)</el>
+  <el tag="0873xx85" keyword="InternalData1085" vr="DS" vm="1">Internal data (0873,1085)</el>
+  <el tag="0873xx86" keyword="InternalData1086" vr="US" vm="1">Internal data (0873,1086)</el>
+  <el tag="0873xx87" keyword="InternalData1087" vr="DS" vm="1">Internal data (0873,1087)</el>
+  <el tag="0873xx88" keyword="InternalData1088" vr="DS" vm="1">Internal data (0873,1088)</el>
+  <el tag="0873xx89" keyword="InternalData1089" vr="US" vm="1">Internal data (0873,1089)</el>
+  <el tag="0873xx90" keyword="InternalData1090" vr="FL" vm="1">Internal data (0873,1090)</el>
+  <el tag="0873xx91" keyword="InternalData1091" vr="FL" vm="1">Internal data (0873,1091)</el>
+  <el tag="0873xx92" keyword="InternalData1092" vr="CS" vm="1">Internal data (0873,1092)</el>
+</elements>

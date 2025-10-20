@@ -330,6 +330,7 @@
     <remoteResource>http---www.gemedicalsystems.com-it_solutions-bamwallthickness-1.0.xml</remoteResource>
     <remoteResource>http---www.gemedicalsystems.com-it_solutions-orthoview-2.1.xml</remoteResource>
     <remoteResource>http---www.gemedicalsystems.com-it_solutions-rad_pacs-.xml</remoteResource>
+    <remoteResource>eosimaging.xml</remoteResource>
     <remoteResource>commandelements.xml</remoteResource>
     <remoteResource>elements.xml</remoteResource>
     <remoteResource>dataelements.xml</remoteResource>

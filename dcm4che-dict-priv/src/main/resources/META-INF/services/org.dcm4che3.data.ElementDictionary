@@ -1,4 +1,5 @@
 org.dcm4che3.dict.archive.PrivateElementDictionary
+org.dcm4che3.dict.eosimaging.PrivateElementDictionary
 org.dcm4che3.dict.elscint.PrivateElementDictionary
 org.dcm4che3.dict.acuson.PrivateElementDictionary
 org.dcm4che3.dict.acuson_1_2_840_113680_1_0_0910.PrivateElementDictionary

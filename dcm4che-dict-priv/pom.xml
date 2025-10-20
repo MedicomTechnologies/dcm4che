@@ -20053,6 +20053,71 @@
                 </fileMapper>
               </fileMappers>
             </transformationSet>
+            <transformationSet>
+              <dir>${project.build.directory}/maven-shared-archive-resources</dir>
+              <includes>
+                <include>eosimaging.xml</include>
+              </includes>
+              <stylesheet>src/main/xsl/PrivateKeyword.java.xsl</stylesheet>
+              <parameters>
+                <parameter>
+                  <name>package</name>
+                  <value>eosimaging</value>
+                </parameter>
+              </parameters>
+              <outputDir>target/generated-java/org/dcm4che3/dict/eosimaging</outputDir>
+              <fileMappers>
+                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.MergeFileMapper">
+                  <targetName>PrivateKeyword.java</targetName>
+                </fileMapper>
+              </fileMappers>
+            </transformationSet>
+            <transformationSet>
+              <dir>${project.build.directory}/maven-shared-archive-resources</dir>
+              <includes>
+                <include>eosimaging.xml</include>
+              </includes>
+              <stylesheet>src/main/xsl/PrivateTag.java.xsl</stylesheet>
+              <parameters>
+                <parameter>
+                  <name>package</name>
+                  <value>eosimaging</value>
+                </parameter>
+                <parameter>
+                  <name>PrivateCreatorID</name>
+                  <value>EOS imaging</value>
+                </parameter>
+              </parameters>
+              <outputDir>target/generated-java/org/dcm4che3/dict/eosimaging</outputDir>
+              <fileMappers>
+                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.MergeFileMapper">
+                  <targetName>PrivateTag.java</targetName>
+                </fileMapper>
+              </fileMappers>
+            </transformationSet>
+            <transformationSet>
+              <dir>${project.build.directory}/maven-shared-archive-resources</dir>
+              <includes>
+                <include>eosimaging.xml</include>
+              </includes>
+              <stylesheet>src/main/xsl/PrivateElementDictionary.java.xsl</stylesheet>
+              <parameters>
+                <parameter>
+                  <name>package</name>
+                  <value>eosimaging</value>
+                </parameter>
+                <parameter>
+                  <name>PrivateCreatorID</name>
+                  <value>EOS imaging</value>
+                </parameter>
+              </parameters>
+              <outputDir>target/generated-java/org/dcm4che3/dict/eosimaging</outputDir>
+              <fileMappers>
+                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.MergeFileMapper">
+                  <targetName>PrivateElementDictionary.java</targetName>
+                </fileMapper>
+              </fileMappers>
+            </transformationSet>
           </transformationSets>
         </configuration>
       </plugin>
