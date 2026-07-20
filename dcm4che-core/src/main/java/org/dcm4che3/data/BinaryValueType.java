@@ -38,6 +38,9 @@
 
 package org.dcm4che3.data;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -65,6 +68,11 @@ enum BinaryValueType implements ValueType {
         protected byte[] toBytes(int i, byte[] b, int off, boolean bigEndian) {
             b[off] = (byte) i;
             return b;
+        }
+
+        @Override
+        protected byte[] toBytes(long l, byte[] b, int off, boolean bigEndian) {
+            return toBytes((int) l, b, off, bigEndian);
         }
     },
     SHORT(2, 2) {
@@ -609,7 +617,11 @@ enum BinaryValueType implements ValueType {
         for (int i = 0, off = 0; i < ds.length; i++, off += numBytes)
             ds[i] = toDouble(b, off, bigEndian);
         return ds;
-    } 
+    }
+
+    @Override public Temporal toTemporal(Object val, int valueIndex, DatePrecision precision) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public Date toDate(Object val, TimeZone tz, int valueIndex, boolean ceil,

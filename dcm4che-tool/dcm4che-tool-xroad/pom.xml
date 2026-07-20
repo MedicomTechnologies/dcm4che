@@ -45,7 +45,7 @@
   <parent>
     <artifactId>dcm4che-tool</artifactId>
     <groupId>org.dcm4che.tool</groupId>
-    <version>5.32.0</version>
+    <version>5.35.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -69,7 +69,6 @@
     <dependency>
       <groupId>com.sun.xml.ws</groupId>
       <artifactId>rt</artifactId>
-      <version>4.0.2</version>
     </dependency>
   </dependencies>
 

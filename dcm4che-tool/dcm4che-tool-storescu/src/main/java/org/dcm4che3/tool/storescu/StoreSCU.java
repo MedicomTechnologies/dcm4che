@@ -68,6 +68,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Predicate;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -90,6 +91,8 @@ public class StoreSCU {
     private Attributes attrs;
     private String uidSuffix;
     private boolean relExtNeg;
+    private boolean noImplicitVRLittleEndian;
+    private boolean noExplicitVRLittleEndian;
     private int priority;
     private String tmpPrefix = "storescu-";
     private String tmpSuffix;
@@ -179,6 +182,8 @@ public class StoreSCU {
         CLIUtils.addResponseTimeoutOption(opts);
         CLIUtils.addPriorityOption(opts);
         CLIUtils.addCommonOptions(opts);
+        opts.addOption(null, "no-ivrle", false, rb.getString("no-ivrle"));
+        opts.addOption(null, "no-evrle", false, rb.getString("no-evrle"));
         addStoreTCOptions(opts);
         addTmpFileOptions(opts);
         addRelatedSOPClassOptions(opts);
@@ -214,6 +219,7 @@ public class StoreSCU {
                 .desc(rb.getString("store-tcs"))
                 .longOpt("store-tcs")
                 .build());
+
     }
 
     public static void addTmpFileOptions(Options opts) {
@@ -262,6 +268,8 @@ public class StoreSCU {
             if (echo) {
                 configureStorageSOPClasses(main, cl);
             } else {
+                main.setNoImplicitVRLittleEndian(cl.hasOption("no-ivrle"));
+                main.setNoExplicitVRLittleEndian(cl.hasOption("no-evrle"));
                 System.out.println(rb.getString("scanning"));
                 t1 = System.currentTimeMillis();
                 main.scanFiles(argList);
@@ -375,38 +383,53 @@ public class StoreSCU {
         relExtNeg = enable;
     }
 
-    public void scanFiles(List<String> fnames) throws IOException {
-        this.scanFiles(fnames, true);
+    public void setNoImplicitVRLittleEndian(boolean noImplicitVRLittleEndian) {
+        this.noImplicitVRLittleEndian = noImplicitVRLittleEndian;
     }
 
-    public void scanFiles(List<String> fnames, boolean printout)
-            throws IOException {
+    public void setNoExplicitVRLittleEndian(boolean noExplicitVRLittleEndian) {
+        this.noExplicitVRLittleEndian = noExplicitVRLittleEndian;
+    }
+
+    public void scanFiles(List<String> fnames) throws IOException {
         tmpFile = File.createTempFile(tmpPrefix, tmpSuffix, tmpDir);
         tmpFile.deleteOnExit();
-        final BufferedWriter fileInfos = new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(tmpFile)));
-        try {
-            DicomFiles.scan(fnames, printout, new DicomFiles.Callback() {
+        try (BufferedWriter fileInfos = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(tmpFile)))) {
+            for (String fname : fnames)
+                scan(new File(fname), fileInfos);
+        }
+    }
 
-                @Override
-                public boolean dicomFile(File f, Attributes fmi, long dsPos,
-                        Attributes ds) throws IOException {
-                    if (!addFile(fileInfos, f, dsPos, fmi, ds))
-                        return false;
-
-                    filesScanned++;
-                    return true;
-                }
-            });
-        } finally {
-            fileInfos.close();
+    private void scan(File f, BufferedWriter fileInfos) {
+        if (f.isDirectory()) {
+            for (String s : f.list())
+                scan(new File(f, s), fileInfos);
+            return;
+        }
+        try (DicomInputStream in = new DicomInputStream(f)) {
+            in.setIncludeBulkData(IncludeBulkData.NO);
+            Attributes fmi = in.readFileMetaInformation();
+            long dsPos = in.getPosition();
+            if (fmi == null || !fmi.containsValue(Tag.TransferSyntaxUID)
+                    || !fmi.containsValue(Tag.MediaStorageSOPClassUID)
+                    || !fmi.containsValue(Tag.MediaStorageSOPInstanceUID)) {
+                Attributes ds = in.readDataset(Tag.SOPInstanceUID + 1);
+                fmi = ds.createFileMetaInformation(in.getTransferSyntax());
+            }
+            boolean b = addFile(fileInfos, f, dsPos, fmi);
+            if (b) filesScanned++;
+            System.out.print(b ? '.' : 'I');
+        } catch (Exception e) {
+            System.out.println();
+            System.out.println("Failed to scan file " + f + ": " + e.getMessage());
+            e.printStackTrace(System.out);
         }
     }
 
     public void sendFiles() throws IOException {
-        BufferedReader fileInfos = new BufferedReader(new InputStreamReader(
-                new FileInputStream(tmpFile)));
-        try {
+        try (BufferedReader fileInfos = new BufferedReader(
+                new InputStreamReader(new FileInputStream(tmpFile)))) {
             String line;
             while (as.isReadyForDataTransfer()
                     && (line = fileInfos.readLine()) != null) {
@@ -423,13 +446,11 @@ public class StoreSCU {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } finally {
-            SafeClose.close(fileInfos);
         }
     }
 
     public boolean addFile(BufferedWriter fileInfos, File f, long endFmi,
-            Attributes fmi, Attributes ds) throws IOException {
+            Attributes fmi) throws IOException {
         String cuid = fmi.getString(Tag.MediaStorageSOPClassUID);
         String iuid = fmi.getString(Tag.MediaStorageSOPInstanceUID);
         String ts = fmi.getString(Tag.TransferSyntaxUID);
@@ -454,11 +475,11 @@ public class StoreSCU {
             if (relExtNeg)
                 rq.addCommonExtendedNegotiation(relSOPClasses
                         .getCommonExtendedNegotiation(cuid));
-            if (!ts.equals(UID.ExplicitVRLittleEndian))
+            if (!ts.equals(UID.ExplicitVRLittleEndian) && !noExplicitVRLittleEndian)
                 rq.addPresentationContext(new PresentationContext(rq
                         .getNumberOfPresentationContexts() * 2 + 1, cuid,
                         UID.ExplicitVRLittleEndian));
-            if (!ts.equals(UID.ImplicitVRLittleEndian))
+            if (!ts.equals(UID.ImplicitVRLittleEndian) && !noImplicitVRLittleEndian)
                 rq.addPresentationContext(new PresentationContext(rq
                         .getNumberOfPresentationContexts() * 2 + 1, cuid,
                         UID.ImplicitVRLittleEndian));

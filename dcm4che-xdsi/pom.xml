@@ -46,7 +46,7 @@
   <parent>
     <artifactId>dcm4che-parent</artifactId>
     <groupId>org.dcm4che</groupId>
-    <version>5.32.0</version>
+    <version>5.35.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -67,7 +67,6 @@
     <dependency>
       <groupId>org.jboss.ws.cxf</groupId>
       <artifactId>jbossws-cxf-client</artifactId>
-        <version>7.1.0.Final</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
