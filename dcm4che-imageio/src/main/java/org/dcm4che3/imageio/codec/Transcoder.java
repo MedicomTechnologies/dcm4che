@@ -172,6 +172,8 @@ public class Transcoder implements Closeable {
 
     private byte[] buffer;
 
+    private long encapsulatedPixelDataValueTotalLength;
+
     public Transcoder(File f) throws IOException {
         this(new DicomInputStream(f));
     }
@@ -315,7 +317,8 @@ public class Transcoder implements Closeable {
 
     private String adaptSuitableSyntax(String dstTsuid) {
         int bitsStored = imageDescriptor.getBitsStored();
-        if(bitsStored == 1 && imageDescriptor.getBitsAllocated() == 1) {
+        if (imageDescriptor.getBitsAllocated() == 1
+                && TransferSyntaxType.forUID(dstTsuid) != TransferSyntaxType.NATIVE) {
             return srcTransferSyntax;
         }
         switch (dstTsuid) {
@@ -338,7 +341,13 @@ public class Transcoder implements Closeable {
             case UID.HTJ2KLosslessRPCL:
             case UID.HTJ2K:
                 return bitsStored <= 16 ? dstTsuid : UID.ExplicitVRLittleEndian;
-            default:
+            case UID.JPEGXLLossless:
+                return bitsStored <= 32 ? dstTsuid : UID.ExplicitVRLittleEndian;
+            case UID.JPEGXLJPEGRecompression:
+            case UID.JPEGXL:
+                return bitsStored <= 8  ? dstTsuid
+                        : bitsStored <= 32 ? UID.JPEGXLLossless : UID.ExplicitVRLittleEndian;
+          default:
                 return dstTsuid;
         }
     }
@@ -361,6 +370,10 @@ public class Transcoder implements Closeable {
      */
     public Attributes getFileMetaInformation() {
         return fileMetaInformation;
+    }
+
+    public long getEncapsulatedPixelDataValueTotalLength() {
+        return encapsulatedPixelDataValueTotalLength;
     }
 
     private void initDecompressor() {
@@ -493,6 +506,7 @@ public class Transcoder implements Closeable {
                     dos.write(0);
                 }
             }
+            encapsulatedPixelDataValueTotalLength += dis.unsignedLength();
         }
 
         @Override

@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -419,5 +418,16 @@ public class StringUtils {
         for (String s : ss)
             requireNotEmpty(s, message);
         return ss;
+    }
+
+    public static String getPropertyOrEnv(String property, String env, String def) {
+        String value = System.getProperty(property);
+        if (value == null) {
+            value = System.getenv(env);
+            if (value == null) {
+                value = def;
+            }
+        }
+        return value;
     }
 }

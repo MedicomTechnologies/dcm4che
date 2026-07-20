@@ -229,60 +229,59 @@ public class SpecificCharacterSetTest {
             (byte) 0x9e, (byte) 0x61 };
 
     private SpecificCharacterSet iso8859_1() {
-        return SpecificCharacterSet.valueOf(new String[] { "ISO_IR 100" });
+        return SpecificCharacterSet.valueOf("ISO_IR 100");
     }
 
     private SpecificCharacterSet iso8859_5() {
-        return SpecificCharacterSet.valueOf(new String[] { "ISO_IR 144" });
+        return SpecificCharacterSet.valueOf("ISO_IR 144");
     }
 
     private SpecificCharacterSet iso8859_6() {
-        return SpecificCharacterSet.valueOf(new String[] { "ISO_IR 127" });
+        return SpecificCharacterSet.valueOf("ISO_IR 127");
     }
 
     private SpecificCharacterSet iso8859_7() {
-        return SpecificCharacterSet.valueOf(new String[] { "ISO_IR 126" });
+        return SpecificCharacterSet.valueOf("ISO_IR 126");
     }
 
     private SpecificCharacterSet iso8859_8() {
-        return SpecificCharacterSet.valueOf(new String[] { "ISO_IR 138" });
+        return SpecificCharacterSet.valueOf("ISO_IR 138");
+    }
+
+    private SpecificCharacterSet iso8859_15() {
+        return SpecificCharacterSet.valueOf("ISO_IR 203");
     }
 
     private SpecificCharacterSet jisX0208() {
-        return SpecificCharacterSet.valueOf(
-                new String[] { null, "ISO 2022 IR 87" });
+        return SpecificCharacterSet.valueOf(null, "ISO 2022 IR 87");
     }
 
     private SpecificCharacterSet jisX0201() {
-        return SpecificCharacterSet.valueOf(
-                new String[] { "ISO 2022 IR 13", "ISO 2022 IR 87" });
+        return SpecificCharacterSet.valueOf("ISO 2022 IR 13", "ISO 2022 IR 87");
     }
 
     private SpecificCharacterSet jisX0201_withAlias() {
-        return SpecificCharacterSet.valueOf(
-                new String[] { "ISO_IR 13", "ISO 2022 IR 87" });
+        return SpecificCharacterSet.valueOf("ISO_IR 13", "ISO 2022 IR 87");
     }
 
     private SpecificCharacterSet ksx1001() {
-        return SpecificCharacterSet.valueOf(
-                new String[] { null, "ISO 2022 IR 149" });
+        return SpecificCharacterSet.valueOf(null, "ISO 2022 IR 149");
     }
 
     private SpecificCharacterSet gb2312() {
-        return SpecificCharacterSet.valueOf(
-                new String[] { null, "ISO 2022 IR 58" });
+        return SpecificCharacterSet.valueOf(null, "ISO 2022 IR 58");
     }
 
     private SpecificCharacterSet utf8() {
-        return SpecificCharacterSet.valueOf(new String[] { "ISO_IR 192" });
+        return SpecificCharacterSet.valueOf("ISO_IR 192");
     }
 
     private SpecificCharacterSet gb18030() {
-        return SpecificCharacterSet.valueOf(new String[] { "GB18030" });
+        return SpecificCharacterSet.valueOf("GB18030");
     }
 
     private SpecificCharacterSet gbk() {
-        return SpecificCharacterSet.valueOf(new String[] { "GBK" });
+        return SpecificCharacterSet.valueOf("GBK");
     }
 
     @Test
@@ -294,7 +293,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeGermanPersonName() {
         assertEquals(GERMAN_PERSON_NAME,
-                iso8859_1().decode(GERMAN_PERSON_NAME_BYTE));
+                iso8859_1().decode(GERMAN_PERSON_NAME_BYTE, PN_DELIMS));
     }
 
     @Test
@@ -306,7 +305,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeFrenchPersonName() {
         assertEquals(FRENCH_PERSON_NAME,
-                iso8859_1().decode(FRENCH_PERSON_NAME_BYTE));
+                iso8859_1().decode(FRENCH_PERSON_NAME_BYTE, PN_DELIMS));
     }
 
     @Test
@@ -318,7 +317,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeRussianPersonName() {
         assertEquals(RUSSIAN_PERSON_NAME,
-                iso8859_5().decode(RUSSIAN_PERSON_NAME_BYTE));
+                iso8859_5().decode(RUSSIAN_PERSON_NAME_BYTE, PN_DELIMS));
     }
 
     @Test
@@ -330,7 +329,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeArabicPersonName() {
         assertEquals(ARABIC_PERSON_NAME,
-                iso8859_6().decode(ARABIC_PERSON_NAME_BYTE));
+                iso8859_6().decode(ARABIC_PERSON_NAME_BYTE, PN_DELIMS));
     }
 
     @Test
@@ -342,7 +341,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeGreekPersonName() {
         assertEquals(GREEK_PERSON_NAME,
-                iso8859_7().decode(GREEK_PERSON_NAME_BYTE));
+                iso8859_7().decode(GREEK_PERSON_NAME_BYTE, PN_DELIMS));
     }
 
     @Test
@@ -354,7 +353,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeHebrewPersonName() {
         assertEquals(HEBREW_PERSON_NAME,
-                iso8859_8().decode(HEBREW_PERSON_NAME_BYTE));
+                iso8859_8().decode(HEBREW_PERSON_NAME_BYTE, PN_DELIMS));
     }
 
     @Test
@@ -366,7 +365,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeJapanesePersonNameASCII() {
         assertEquals(JAPANESE_PERSON_NAME_ASCII,
-                jisX0208().decode(JAPANESE_PERSON_NAME_ASCII_BYTES));
+                jisX0208().decode(JAPANESE_PERSON_NAME_ASCII_BYTES, PN_DELIMS));
     }
 
      @Test
@@ -378,7 +377,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeJapanesePersonNameJISX0201() {
         assertEquals(JAPANESE_PERSON_NAME_JISX0201,
-                jisX0201().decode(JAPANESE_PERSON_NAME_JISX0201_BYTES));
+                jisX0201().decode(JAPANESE_PERSON_NAME_JISX0201_BYTES, PN_DELIMS));
     }
 
     @Test
@@ -390,7 +389,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeJapanesePersonNameJISX0201_withAlias() {
         assertEquals(JAPANESE_PERSON_NAME_JISX0201,
-                jisX0201_withAlias().decode(JAPANESE_PERSON_NAME_JISX0201_BYTES));
+                jisX0201_withAlias().decode(JAPANESE_PERSON_NAME_JISX0201_BYTES, PN_DELIMS));
     }
 
     @Test
@@ -402,7 +401,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeKoreanPersonName() {
         assertEquals(KOREAN_PERSON_NAME,
-                ksx1001().decode(KOREAN_PERSON_NAME_BYTES));
+                ksx1001().decode(KOREAN_PERSON_NAME_BYTES, PN_DELIMS));
     }
 
     @Test
@@ -414,7 +413,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeKoreanLongText() {
         assertEquals(KOREAN_LONG_TEXT,
-                ksx1001().decode(KOREAN_LONG_TEXT_NO_EXPLICIT_ESCSEQ_BYTES));
+                ksx1001().decode(KOREAN_LONG_TEXT_NO_EXPLICIT_ESCSEQ_BYTES, LT_DELIMS));
     }
 
     @Test
@@ -426,7 +425,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeChinesePersonNameGB2312() {
         assertEquals(CHINESE_PERSON_NAME_GB2312,
-                gb2312().decode(CHINESE_PERSON_NAME_GB2312_BYTES));
+                gb2312().decode(CHINESE_PERSON_NAME_GB2312_BYTES, PN_DELIMS));
     }
 
     @Test
@@ -438,7 +437,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeChineseLongTextGB2312() {
         assertEquals(CHINESE_LONG_TEXT_GB2312,
-                gb2312().decode(CHINESE_LONG_TEXT_GB2312_BYTES));
+                gb2312().decode(CHINESE_LONG_TEXT_GB2312_BYTES, LT_DELIMS));
     }
 
     @Test
@@ -450,7 +449,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeChinesePersonNameUTF8() {
         assertEquals(CHINESE_PERSON_NAME_UTF8,
-                utf8().decode(CHINESE_PERSON_NAME_UTF8_BYTES));
+                utf8().decode(CHINESE_PERSON_NAME_UTF8_BYTES, PN_DELIMS));
     }
 
     @Test
@@ -462,7 +461,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeChinesePersonNameGB18030() {
         assertEquals(CHINESE_PERSON_NAME_GB18030,
-                gb18030().decode(CHINESE_PERSON_NAME_GB18030_BYTES));
+                gb18030().decode(CHINESE_PERSON_NAME_GB18030_BYTES, PN_DELIMS));
     }
 
     @Test
@@ -474,7 +473,7 @@ public class SpecificCharacterSetTest {
     @Test
     public void testDecodeChinesePersonNameGBK() {
         assertEquals(CHINESE_PERSON_NAME_GB18030,
-                gbk().decode(CHINESE_PERSON_NAME_GB18030_BYTES));
+                gbk().decode(CHINESE_PERSON_NAME_GB18030_BYTES, PN_DELIMS));
     }
     
     @Test
@@ -521,30 +520,20 @@ public class SpecificCharacterSetTest {
                       expectedStrings.length );
         for ( int i = 0; i < edgeCases.length; ++i ) {
             assertEquals( "Unexpected value for the sequence with the index " + i, expectedStrings[ i ],
-                          jisX0201().decode( edgeCases[ i ] ) );
+                          jisX0201().decode( edgeCases[ i ], LT_DELIMS ) );
         }
     }
 
     @Test
     public void testEncodeFinnishPersonName8859_15() {
-        SpecificCharacterSet.setCharsetNameMapping("ISO_IR 100", "ISO-8859-15");
-        try {
-            assertArrayEquals(FINNISH_PERSON_NAME_8859_15_BYTES,
-                    iso8859_1().encode(FINNISH_PERSON_NAME, PN_DELIMS));
-        } finally {
-            SpecificCharacterSet.resetCharsetNameMappings();
-        }
+        assertArrayEquals(FINNISH_PERSON_NAME_8859_15_BYTES,
+                iso8859_15().encode(FINNISH_PERSON_NAME, PN_DELIMS));
     }
 
     @Test
     public void testDecodeFinnishPersonName8859_15() {
-        SpecificCharacterSet.setCharsetNameMapping("ISO_IR 100", "ISO-8859-15");
-        try {
-            assertEquals(FINNISH_PERSON_NAME,
-                    iso8859_1().decode(FINNISH_PERSON_NAME_8859_15_BYTES));
-        } finally {
-            SpecificCharacterSet.resetCharsetNameMappings();
-        }
+        assertEquals(FINNISH_PERSON_NAME,
+                iso8859_15().decode(FINNISH_PERSON_NAME_8859_15_BYTES, PN_DELIMS));
     }
 
     @Test
@@ -563,7 +552,7 @@ public class SpecificCharacterSetTest {
         SpecificCharacterSet.setCharsetNameMapping("ISO_IR 100", "windows-1252");
         try {
             assertEquals(FINNISH_PERSON_NAME,
-                    iso8859_1().decode(FINNISH_PERSON_NAME_WINDOWS_1252_BYTE));
+                    iso8859_1().decode(FINNISH_PERSON_NAME_WINDOWS_1252_BYTE, PN_DELIMS));
         } finally {
             SpecificCharacterSet.resetCharsetNameMappings();
         }

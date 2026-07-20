@@ -42,6 +42,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -92,8 +99,8 @@ public class Attributes implements Serializable {
             LoggerFactory.getLogger(Attributes.class);
 
     private static final int INIT_CAPACITY = 16;
-    private static final int TO_STRING_LIMIT = 50;
-    private static final int TO_STRING_WIDTH = 78;
+    private static final int TO_STRING_LIMIT = Integer.getInteger("org.dcm4che3.Attributes.toString.limit", 50);
+    private static final int TO_STRING_WIDTH = Integer.getInteger("org.dcm4che3.Attributes.toString.width", 78);
     private transient Attributes parent;
     private transient String parentSequencePrivateCreator;
     private transient int parentSequenceTag;
@@ -1241,6 +1248,89 @@ public class Attributes implements Serializable {
         }
     }
 
+    /**
+     * Gets the most accurate temporal type for the given tag.
+     * <p>
+     * An instance of {@link ZonedDateTime} will be returned for:
+     * <ul>
+     *     <li>A tag with {@link VR#DT} which has a timezone offset defined within its value.</li>
+     *     <li>A tag with {@link VR#DT} without a timezone offset within its value,
+     *     but a {@link Tag#TimezoneOffsetFromUTC} is defined within this or any parent Attributes,
+     *     or a default TimeZone (see {@link #setDefaultTimeZone(TimeZone)}) has been set for this or any parent.</li>
+     * </ul>
+     *
+     * If no timezone information is available, then an instance of {@link LocalDateTime} will be returned for
+     * {@link VR#DT} tags.
+     *
+     * For {@link VR#DA} or {@link VR#TM} tags an instance of {@link LocalDate} or {@link LocalTime} will be returned.
+     *
+     * In case the value for the given tag itself is not set (or empty), then <code>null</code> (or the supplied
+     * <code>defVal</code> for other variants of this method) will be returned.
+     *
+     * @param tag tag number
+     * @return an instance of {@link ZonedDateTime}, {@link LocalDateTime}, {@link LocalDate} or {@link LocalTime}, or null
+     */
+    public Temporal getTemporal(int tag) {
+        return getTemporal(null, tag, null, 0, null, new DatePrecision());
+    }
+
+    // TODO variants of getTemporal missing here
+
+    /**
+     * See {@link #getTemporal(int)}.
+     *
+     * @param privateCreator private creator
+     * @param tag tag number
+     * @param vr VR
+     * @param valueIndex value index
+     * @param defVal default value, if the tag value is not set or empty
+     * @param precision used as a return value: contains information about the contained date/time precision and
+     *                  whether the tag value itself contained timezone information (only for {@link VR#DT} tags).
+     * @return an instance of {@link ZonedDateTime}, {@link LocalDateTime}, {@link LocalDate} or {@link LocalTime}, or defVal
+     */
+    public Temporal getTemporal(String privateCreator, int tag, VR vr, int valueIndex, Temporal defVal, DatePrecision precision) {
+        int index = indexOf(privateCreator, tag);
+        if (index < 0)
+            return defVal;
+
+        Object value = values[index];
+        if (value == Value.NULL)
+            return defVal;
+
+        vr = updateVR(index, vr);
+
+        if (!vr.isTemporalType()) {
+            LOG.info("Attempt to access {} {} as date/time", TagUtils.toString(tag), vr);
+            return defVal;
+        }
+
+        value = decodeStringValue(index);
+        if (value == Value.NULL) {
+            return defVal;
+        }
+
+        Temporal t;
+        try {
+            t = vr.toTemporal(value, valueIndex, precision);
+        } catch (IllegalArgumentException e) {
+            LOG.info("Invalid value of {} {}", TagUtils.toString(tag), vr);
+            return defVal;
+        }
+
+        if(t == null) {
+            return defVal;
+        } else if (t instanceof OffsetDateTime) {
+            return ((OffsetDateTime) t).toZonedDateTime();
+        } else if (t instanceof LocalDateTime) {
+            ZoneId zoneId = getZoneId();
+            if (zoneId != null) {
+                return ((LocalDateTime) t).atZone(zoneId);
+            }
+        }
+
+        return t;
+    }
+
     public Date getDate(int tag) {
         return getDate(null, tag, null, 0, null, new DatePrecision());
     }
@@ -1357,11 +1447,12 @@ public class Attributes implements Serializable {
             LOG.info("Attempt to access {} {} as date", TagUtils.toString(tag), vr);
             return defVal;
         }
-        try {
+
         value = decodeStringValue(index);
-            if (value == Value.NULL)
+        if (value == Value.NULL)
             return defVal;
 
+        try {
             return vr.toDate(value, getTimeZone(), valueIndex, false, defVal, precision);
         } catch (IllegalArgumentException e) {
             LOG.info("Invalid value of {} {}", TagUtils.toString(tag), vr);
@@ -1420,6 +1511,39 @@ public class Attributes implements Serializable {
         }
     }
 
+    // TODO add Javadoc
+    public Temporal getTemporal(long tag) {
+        return getTemporal(null, tag, null, new DatePrecision());
+    }
+
+    // TODO other variants of getTemporal(long tag, ...) method
+
+    public Temporal getTemporal(String privateCreator, long tag, Temporal defVal, DatePrecision precision) {
+        int daTag = (int) (tag >>> 32);
+        int tmTag = (int) tag;
+
+        LocalDate date = (LocalDate)getTemporal(privateCreator, daTag, VR.DA, 0, null, precision);
+        LocalTime time = (LocalTime)getTemporal(privateCreator, tmTag, VR.TM, 0, null, precision);
+
+        if(date != null && time != null) {
+            LocalDateTime localDateTime = LocalDateTime.of(date, time);
+            ZoneId zoneId = getZoneId();
+            if (zoneId != null) {
+                return localDateTime.atZone(zoneId);
+            } else {
+                return localDateTime;
+            }
+        } else if(date != null) {
+            return date;
+        } else if(time != null) {
+            return time;
+        }
+
+        return defVal;
+    }
+
+    // TODO new Temporal[] getTemporals(...) methods (?)
+
     public Date[] getDates(int tag) {
         return getDates(null, tag, null, new DatePrecisions());
     }
@@ -1456,11 +1580,12 @@ public class Attributes implements Serializable {
             LOG.info("Attempt to access {} {} as date", TagUtils.toString(tag), vr);
             return DateUtils.EMPTY_DATES;
         }
-        try {
-            value = decodeStringValue(index);
-            if (value == Value.NULL)
-                return DateUtils.EMPTY_DATES;
 
+        value = decodeStringValue(index);
+        if (value == Value.NULL)
+            return DateUtils.EMPTY_DATES;
+
+        try {
             return vr.toDates(value, getTimeZone(), false, precisions);
         } catch (IllegalArgumentException e) {
             LOG.info("Invalid value of {} {}", TagUtils.toString(tag), vr);
@@ -1496,8 +1621,8 @@ public class Attributes implements Serializable {
         Date[] dates = new Date[da.length];
         precisions.precisions = new DatePrecision[da.length];
         int i = 0;
+        TimeZone tz = getTimeZone();
         try {
-            TimeZone tz = getTimeZone();
             while (i < tm.length)
                 dates[i++] = VR.DT.toDate(da[i] + tm[i], tz, 0, false, null,
                         precisions.precisions[i] = new DatePrecision());
@@ -1620,6 +1745,7 @@ public class Attributes implements Serializable {
     private DateRange toDateRange(String da, String tm) {
         String[] darange = splitRange(da);
         String[] tmrange = splitRange(tm);
+        TimeZone tz = getTimeZone();
         DatePrecision precision = new DatePrecision();
         return new DateRange(
                 darange[0] == null ? null
@@ -1671,6 +1797,16 @@ public class Attributes implements Serializable {
         defaultTimeZone = tz;
     }
 
+    public ZoneId getDefaultZoneId() {
+        if (defaultTimeZone != null)
+            return defaultTimeZone.toZoneId();
+
+        if (parent != null)
+            return parent.getDefaultZoneId();
+
+        return null;
+    }
+
     public TimeZone getDefaultTimeZone() {
         if (defaultTimeZone != null)
             return defaultTimeZone;
@@ -1700,6 +1836,31 @@ public class Attributes implements Serializable {
 
         return tz;
      }
+
+    public ZoneId getZoneId() {
+        // TODO we might want to store the ZoneId, instead of converting every time here
+
+        if (tz != null)
+            return tz.toZoneId();
+
+        if (containsTimezoneOffsetFromUTC) {
+            String s = getString(Tag.TimezoneOffsetFromUTC);
+            if (s == null) {
+                return null;
+            }
+            try {
+                tz = DateUtils.timeZone(s);
+            } catch (IllegalArgumentException e) {
+                LOG.info(e.getMessage());
+                return null;
+            }
+            return tz.toZoneId();
+        } else if (parent != null) {
+            return parent.getZoneId();
+        } else {
+            return getDefaultZoneId();
+        }
+    }
 
     /**
      * Set Timezone Offset From UTC (0008,0201) to specified value and
@@ -3782,11 +3943,15 @@ public class Attributes implements Serializable {
     }
 
     public int removeAllBulkData() {
+        return removeAllBulkData(false);
+    }
+
+    public int removeAllBulkData(boolean containsBulkData) {
         ensureModifiable();
         int removed = 0;
         for (int i = 0; i < size; i++) {
             Object value = values[i];
-            if (isBulkData(value)) {
+            if (isBulkData(value) || containsBulkData && containsBulkData(value)) {
                 int srcPos = i + 1;
                 int len = size - srcPos;
                 System.arraycopy(tags, srcPos, tags, i, len);
@@ -3795,7 +3960,7 @@ public class Attributes implements Serializable {
                 i--;
                 size--;
                 removed++;
-            } else if (value instanceof Sequence) {
+            } else if (!containsBulkData && value instanceof Sequence) {
                 for (Attributes item : (Sequence) value) {
                     removed += item.removeAllBulkData();
                 }
@@ -3808,6 +3973,27 @@ public class Attributes implements Serializable {
         return value instanceof BulkData || (value instanceof Fragments
                 && ((Fragments) value).size() > 1
                 && ((Fragments) value).get(1) instanceof BulkData);
+    }
+
+    private static boolean containsBulkData(Object value) {
+        if (value instanceof Sequence) {
+            for (Attributes item : (Sequence) value) {
+                if (item.containsBulkData()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean containsBulkData() {
+        for (int i = 0; i < size; i++) {
+            Object value = values[i];
+            if (isBulkData(value) || containsBulkData(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int creatorIndexOf(String privateCreator, int groupNumber) {

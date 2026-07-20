@@ -38,6 +38,9 @@
 
 package org.dcm4che3.data;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -393,7 +396,7 @@ enum StringValueType implements ValueType {
             SpecificCharacterSet cs) {
 
         if (val instanceof byte[]) {
-            return splitAndTrim(cs(cs).decode((byte[]) val), cs);
+            return splitAndTrim(cs(cs).decode((byte[]) val, delimiters), cs);
         }
 
         if (val instanceof String
@@ -448,8 +451,25 @@ enum StringValueType implements ValueType {
     @Override
     public double[] toDoubles(Object val, boolean bigEndian) {
         throw new UnsupportedOperationException();
-    } 
+    }
 
+    @Override public Temporal toTemporal(Object val, int valueIndex, DatePrecision precision) {
+        if (temporalType == null)
+            throw new UnsupportedOperationException();
+
+        if (val instanceof String) {
+            return valueIndex == 0
+                    ? temporalType.parseTemporal((String) val, precision)
+                    : null;
+        }
+        if (val instanceof String[]) {
+            String[] ss = (String[]) val;
+            return (valueIndex < ss.length && ss[valueIndex] != null)
+                    ? temporalType.parseTemporal(ss[valueIndex], precision)
+                    : null;
+        }
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public Date toDate(Object val, TimeZone tz, int valueIndex, boolean ceil,
@@ -567,7 +587,7 @@ enum StringValueType implements ValueType {
     public boolean prompt(Object val, boolean bigEndian,
             SpecificCharacterSet cs, int maxChars, StringBuilder sb) {
         if (val instanceof byte[])
-            return prompt(cs(cs).decode((byte[]) val), maxChars, sb);
+            return prompt(cs(cs).decode((byte[]) val, delimiters), maxChars, sb);
 
         if (val instanceof String)
             return prompt((String) val, maxChars, sb);
