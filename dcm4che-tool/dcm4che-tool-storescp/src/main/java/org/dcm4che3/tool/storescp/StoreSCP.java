@@ -47,6 +47,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -88,6 +89,7 @@ public class StoreSCP {
     private static ResourceBundle rb =
         ResourceBundle.getBundle("org.dcm4che3.tool.storescp.messages");
     private static final String PART_EXT = ".part";
+    private static final Pattern UID_PATTERN = Pattern.compile("^[0-2]((\\.0)|(\\.[1-9][0-9]*))*$");
 
     private final Device device = new Device("storescp");
     private final ApplicationEntity ae = new ApplicationEntity("*");
@@ -120,7 +122,7 @@ public class StoreSCP {
                             data, file);
                     renameTo(as, file, new File(storageDir,
                             filePathFormat == null
-                                    ? iuid
+                                    ? validateUID(iuid)
                                     : filePathFormat.format(parse(file))));
                 } catch (Exception e) {
                     deleteFile(as, file);
@@ -132,6 +134,13 @@ public class StoreSCP {
         }
 
     };
+
+    private static String validateUID(String iuid) {
+        if (!UID_PATTERN.matcher(iuid).matches()) {
+            throw new IllegalArgumentException("Invalid Affected SOP Instance UID: " + iuid);
+        }
+        return iuid;
+    }
 
     private void sleep(Association as, int[] delays) {
         int responseDelay = delays != null
